@@ -19,17 +19,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     >
                         <Menu className="w-5 h-5 text-gray-600 group-hover:scale-110 transition-transform duration-300" />
                     </button>
-
-                    <div className="hidden md:block">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm dịch vụ, tài khoản..."
-                                className="pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 w-80 bg-white/50 backdrop-blur-sm transition-all duration-300 hover:bg-white/80"
-                            />
-                        </div>
-                    </div>
                 </div>
 
                 {/* Right side */}
