@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import {
     Users,
     Search,
-    Filter,
     Download,
     Plus,
     Edit,
@@ -115,12 +114,7 @@ const AdminUsersPage = () => {
         }
     };
 
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(amount);
-    };
+
 
     const filteredUsers = users.filter(user => {
         const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

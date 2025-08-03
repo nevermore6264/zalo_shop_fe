@@ -7,7 +7,6 @@ import {
     Package,
     Shield,
     Clock,
-    Star,
     Activity,
     BarChart3,
     AlertTriangle,

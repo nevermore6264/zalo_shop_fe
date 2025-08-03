@@ -7,20 +7,12 @@ import {
     CreditCard,
     Users,
     ShoppingCart,
-    Calendar,
     Download,
-    Filter,
-    Search,
-    BarChart3,
-    PieChart,
-    LineChart,
     Activity,
     ArrowUpRight,
-    ArrowDownRight,
     Eye,
     MoreHorizontal,
     RefreshCw,
-    Settings,
     Clock,
     XCircle
 } from 'lucide-react';
@@ -188,7 +180,6 @@ const AdminRevenuePage = () => {
     // Calculate chart statistics
     const totalRevenue = chartData.reduce((sum, item) => sum + item.revenue, 0);
     const totalOrders = chartData.reduce((sum, item) => sum + item.orders, 0);
-    const totalCustomers = chartData.reduce((sum, item) => sum + item.customers, 0);
     const averageRevenue = Math.round(totalRevenue / chartData.length);
 
     return (

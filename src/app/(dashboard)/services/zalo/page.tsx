@@ -4,10 +4,6 @@ import React, { useState } from 'react';
 import {
     ShoppingCart,
     Eye,
-    ThumbsUp,
-    MessageCircle,
-    Users,
-    UserPlus,
     History,
     Search,
     ChevronDown,
@@ -109,8 +105,8 @@ const ZaloServicesPage = () => {
                         <button
                             onClick={() => setActiveTab('services')}
                             className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center space-x-2 ${activeTab === 'services'
-                                    ? 'bg-white text-blue-600 shadow-md'
-                                    : 'text-gray-600 hover:text-gray-900'
+                                ? 'bg-white text-blue-600 shadow-md'
+                                : 'text-gray-600 hover:text-gray-900'
                                 }`}
                         >
                             <ShoppingCart className="w-5 h-5" />
@@ -119,8 +115,8 @@ const ZaloServicesPage = () => {
                         <button
                             onClick={() => setActiveTab('history')}
                             className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center space-x-2 ${activeTab === 'history'
-                                    ? 'bg-white text-blue-600 shadow-md'
-                                    : 'text-gray-600 hover:text-gray-900'
+                                ? 'bg-white text-blue-600 shadow-md'
+                                : 'text-gray-600 hover:text-gray-900'
                                 }`}
                         >
                             <History className="w-5 h-5" />
@@ -404,8 +400,8 @@ const ZaloServicesPage = () => {
                                                     <td className="p-4 text-sm text-gray-600">{order.updatedAt}</td>
                                                     <td className="p-4">
                                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === 'completed'
-                                                                ? 'bg-green-100 text-green-800'
-                                                                : 'bg-yellow-100 text-yellow-800'
+                                                            ? 'bg-green-100 text-green-800'
+                                                            : 'bg-yellow-100 text-yellow-800'
                                                             }`}>
                                                             {order.status === 'completed' ? 'Hoàn thành' : 'Đang xử lý'}
                                                         </span>

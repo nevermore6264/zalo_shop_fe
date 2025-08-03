@@ -10,8 +10,7 @@ import {
     MessageCircle,
     User,
     CheckCircle,
-    AlertCircle,
-    ChevronDown
+    AlertCircle
 } from 'lucide-react';
 
 const ContactPage = () => {

@@ -9,24 +9,14 @@ import {
     ShoppingCart,
     Settings,
     BarChart3,
-    FileText,
-    Shield,
-    Database,
     Server,
-    Activity,
     DollarSign,
     Package,
     MessageCircle,
     Bell,
     LogOut,
     User,
-    Cog,
-    Eye,
-    Edit,
-    Trash,
-    Plus,
-    Download,
-    Upload
+    Cog
 } from 'lucide-react';
 
 interface AdminSidebarProps {

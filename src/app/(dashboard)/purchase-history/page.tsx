@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import {
     Search,
     ChevronDown,
-    ChevronUp,
     Settings,
     Eye,
     Download,
@@ -155,8 +154,8 @@ const PurchaseHistoryPage = () => {
                                             <td className="p-4">{order.productName}</td>
                                             <td className="p-4">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.available > 0
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-red-100 text-red-800'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-red-100 text-red-800'
                                                     }`}>
                                                     {order.available}
                                                 </span>

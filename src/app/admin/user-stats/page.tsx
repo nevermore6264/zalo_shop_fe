@@ -6,21 +6,13 @@ import {
     UserCheck,
     UserX,
     TrendingUp,
-    TrendingDown,
     Activity,
-    Calendar,
     Download,
-    Filter,
-    Search,
-    BarChart3,
-    PieChart,
-    LineChart,
     MapPin,
     Clock,
     Eye,
     MoreHorizontal,
     RefreshCw,
-    Settings,
     Smartphone,
     Monitor,
     Globe,
@@ -195,8 +187,6 @@ const AdminUserStatsPage = () => {
 
     // Calculate chart statistics
     const totalRegistrations = growthData.reduce((sum, item) => sum + item.registrations, 0);
-    const totalActiveUsers = growthData.reduce((sum, item) => sum + item.activeUsers, 0);
-    const totalPremiumUsers = growthData.reduce((sum, item) => sum + item.premiumUsers, 0);
     const averageRegistrations = Math.round(totalRegistrations / growthData.length);
 
     return (

@@ -6,14 +6,12 @@ import {
     User,
     Shield,
     CreditCard,
-    Search,
     Clock,
     Eye,
     ArrowRight,
     Star,
     TrendingUp,
-    Users,
-    Zap
+    Users
 } from 'lucide-react';
 
 const GuidePage = () => {

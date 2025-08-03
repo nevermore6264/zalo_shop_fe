@@ -2,24 +2,17 @@
 
 import React, { useState } from 'react';
 import {
-    Phone,
-    Mail,
     MessageCircle,
-    MapPin,
-    Clock,
-    User,
-    Send,
     Eye,
     Trash,
     Reply,
     Archive,
-    Search,
-    Filter,
     Download,
     Plus,
     Edit,
     Save,
-    X
+    X,
+    Filter
 } from 'lucide-react';
 
 const AdminContactPage = () => {

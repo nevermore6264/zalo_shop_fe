@@ -8,7 +8,6 @@ import {
     AlertCircle,
     Smartphone,
     Clock,
-    DollarSign,
     ArrowRight,
     Download
 } from 'lucide-react';
@@ -97,8 +96,8 @@ const RechargePage = () => {
                                         key={amount.value}
                                         onClick={() => handleAmountSelect(amount.value)}
                                         className={`p-4 rounded-lg border-2 transition-all duration-200 ${selectedAmount === amount.value && !customAmount
-                                                ? 'border-orange-500 bg-orange-50 text-orange-700'
-                                                : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
+                                            ? 'border-orange-500 bg-orange-50 text-orange-700'
+                                            : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50'
                                             }`}
                                     >
                                         <div className="font-semibold">{amount.label}</div>
@@ -144,8 +143,8 @@ const RechargePage = () => {
                                 <button
                                     onClick={() => setSelectedMethod('qr')}
                                     className={`w-full p-4 rounded-lg border-2 transition-all duration-200 flex items-center space-x-3 ${selectedMethod === 'qr'
-                                            ? 'border-orange-500 bg-orange-50'
-                                            : 'border-gray-200 hover:border-orange-300'
+                                        ? 'border-orange-500 bg-orange-50'
+                                        : 'border-gray-200 hover:border-orange-300'
                                         }`}
                                 >
                                     <QrCode className="w-6 h-6 text-orange-600" />
@@ -158,8 +157,8 @@ const RechargePage = () => {
                                 <button
                                     onClick={() => setSelectedMethod('manual')}
                                     className={`w-full p-4 rounded-lg border-2 transition-all duration-200 flex items-center space-x-3 ${selectedMethod === 'manual'
-                                            ? 'border-orange-500 bg-orange-50'
-                                            : 'border-gray-200 hover:border-orange-300'
+                                        ? 'border-orange-500 bg-orange-50'
+                                        : 'border-gray-200 hover:border-orange-300'
                                         }`}
                                 >
                                     <div className="text-left">

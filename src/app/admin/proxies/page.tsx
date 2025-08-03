@@ -3,25 +3,19 @@ import React, { useState } from 'react';
 import {
     Server,
     Search,
-    Filter,
     Download,
     Plus,
     Edit,
     Trash,
     Eye,
-    Settings,
     RefreshCw,
     CheckCircle,
     XCircle,
     Clock,
     AlertTriangle,
-    Globe,
-    Wifi,
     Shield,
     Activity,
-    MoreHorizontal,
-    Copy,
-    ExternalLink
+    Copy
 } from 'lucide-react';
 
 const AdminProxiesPage = () => {

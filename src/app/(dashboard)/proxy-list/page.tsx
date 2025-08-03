@@ -8,8 +8,6 @@ import {
     Download,
     RefreshCw,
     Search,
-    ChevronDown,
-    ChevronUp,
     Eye,
     Edit,
     Plus
