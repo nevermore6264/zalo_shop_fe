@@ -7,16 +7,13 @@ import {
     Home,
     Users,
     ShoppingCart,
-    Settings,
     BarChart3,
     Server,
     DollarSign,
     Package,
     MessageCircle,
-    Bell,
     LogOut,
-    User,
-    Cog
+    User
 } from 'lucide-react';
 
 interface AdminSidebarProps {
