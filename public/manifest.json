@@ -1,0 +1,26 @@
+{
+  "name": "Zalo Shop - Dịch vụ Zalo uy tín",
+  "short_name": "Zalo Shop",
+  "description": "Cung cấp các dịch vụ Zalo, tài khoản, proxy chất lượng cao",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "vi",
+  "dir": "ltr"
+}

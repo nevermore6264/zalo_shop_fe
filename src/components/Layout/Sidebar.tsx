@@ -46,6 +46,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             title: 'Danh Sách Proxy',
             href: '/proxy-list',
             icon: RefreshCw,
+            hasSubMenu: true,
+            subMenu: [
+                {
+                    title: 'Danh Sách Proxy Động',
+                    href: '/proxy-list?tab=dynamic',
+                },
+                {
+                    title: 'Danh Sách Proxy Tĩnh',
+                    href: '/proxy-list?tab=static',
+                },
+            ],
         },
 
         // Recharge Section
@@ -125,7 +136,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                             );
                         }
 
-                        const isActive = pathname === item.href;
+                        const isActive = pathname === item.href || (item.hasSubMenu && pathname.startsWith(item.href));
                         const Icon = item.icon;
 
                         return (
@@ -171,6 +182,31 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                                         )}
                                     </div>
                                 </Link>
+
+                                {/* Sub-menu */}
+                                {item.hasSubMenu && isActive && (
+                                    <ul className="mt-2 ml-8 space-y-1">
+                                        {item.subMenu.map((subItem, subIndex) => {
+                                            const isSubActive = pathname.includes(subItem.href.split('=')[1]);
+                                            return (
+                                                <li key={subIndex}>
+                                                    <Link
+                                                        href={subItem.href}
+                                                        className={`
+                                                            block px-4 py-2 rounded-lg text-sm transition-all duration-200
+                                                            ${isSubActive
+                                                                ? 'bg-white/20 text-white shadow-md'
+                                                                : 'text-blue-200 hover:bg-white/10 hover:text-white'
+                                                            }
+                                                        `}
+                                                    >
+                                                        {subItem.title}
+                                                    </Link>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                )}
                             </li>
                         );
                     })}
