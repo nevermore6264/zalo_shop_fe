@@ -25,7 +25,6 @@ import {
 const AdminContactPage = () => {
     const [activeTab, setActiveTab] = useState<'info' | 'messages' | 'faq'>('info');
     const [searchTerm, setSearchTerm] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
     const [contactInfo, setContactInfo] = useState({
         phone: '089.95.96.345',
         phoneDescription: 'Hỗ trợ 24/7',
@@ -45,6 +44,18 @@ const AdminContactPage = () => {
         subject: '',
         message: ''
     });
+
+    // FAQ Modal states
+    const [showFaqModal, setShowFaqModal] = useState(false);
+    const [editingFaq, setEditingFaq] = useState<{ id: number, question: string, answer: string } | null>(null);
+    const [faqForm, setFaqForm] = useState({
+        question: '',
+        answer: ''
+    });
+
+    // Delete confirmation modal
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deletingFaq, setDeletingFaq] = useState<{ id: number, question: string } | null>(null);
 
     // Mock data for contact messages
     const contactMessages = [
@@ -134,6 +145,55 @@ const AdminContactPage = () => {
         });
     };
 
+    // FAQ Modal handlers
+    const openFaqModal = (faq?: { id: number, question: string, answer: string }) => {
+        if (faq) {
+            setEditingFaq(faq);
+            setFaqForm({ question: faq.question, answer: faq.answer });
+        } else {
+            setEditingFaq(null);
+            setFaqForm({ question: '', answer: '' });
+        }
+        setShowFaqModal(true);
+    };
+
+    const closeFaqModal = () => {
+        setShowFaqModal(false);
+        setEditingFaq(null);
+        setFaqForm({ question: '', answer: '' });
+    };
+
+    const handleFaqSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (editingFaq) {
+            // Update existing FAQ
+            console.log('Updating FAQ:', { id: editingFaq.id, ...faqForm });
+        } else {
+            // Create new FAQ
+            console.log('Creating new FAQ:', faqForm);
+        }
+        closeFaqModal();
+    };
+
+    // Delete FAQ handlers
+    const openDeleteModal = (faq: { id: number, question: string }) => {
+        setDeletingFaq(faq);
+        setShowDeleteModal(true);
+    };
+
+    const closeDeleteModal = () => {
+        setShowDeleteModal(false);
+        setDeletingFaq(null);
+    };
+
+    const handleDeleteFaq = () => {
+        if (deletingFaq) {
+            console.log('Deleting FAQ:', deletingFaq.id);
+            // Handle delete logic here
+        }
+        closeDeleteModal();
+    };
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -182,192 +242,137 @@ const AdminContactPage = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h2 className="text-lg font-semibold text-gray-900">Thông Tin Liên Hệ</h2>
-                                    <p className="text-sm text-gray-600">{contactInfo.description}</p>
+                                    <p className="text-sm text-gray-600">Chỉnh sửa thông tin liên hệ hiển thị cho khách hàng</p>
                                 </div>
                                 <div className="flex space-x-2">
-                                    {!isEditing ? (
-                                        <button
-                                            onClick={() => setIsEditing(true)}
-                                            className="btn btn-outline btn-sm bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
-                                        >
-                                            <Edit className="w-4 h-4 mr-2" />
-                                            Chỉnh sửa
-                                        </button>
-                                    ) : (
-                                        <>
-                                            <button
-                                                onClick={() => setIsEditing(false)}
-                                                className="btn btn-outline btn-sm bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
-                                            >
-                                                <Save className="w-4 h-4 mr-2" />
-                                                Lưu
-                                            </button>
-                                            <button
-                                                onClick={() => setIsEditing(false)}
-                                                className="btn btn-outline btn-sm bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100"
-                                            >
-                                                <X className="w-4 h-4 mr-2" />
-                                                Hủy
-                                            </button>
-                                        </>
-                                    )}
+                                    <button
+                                        onClick={() => {
+                                            // Handle save logic here
+                                            console.log('Saving contact info:', contactInfo);
+                                            alert('Đã lưu thông tin liên hệ!');
+                                        }}
+                                        className="btn btn-outline btn-sm bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                                    >
+                                        <Save className="w-4 h-4 mr-2" />
+                                        Lưu thay đổi
+                                    </button>
                                 </div>
                             </div>
                         </div>
                         <div className="card-body">
-                            {!isEditing ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    <div className="text-center p-6 bg-blue-50 rounded-lg">
-                                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Phone className="w-6 h-6 text-blue-600" />
-                                        </div>
-                                        <h3 className="font-semibold text-gray-900 mb-2">Điện thoại</h3>
-                                        <p className="text-lg font-bold text-blue-600 mb-1">{contactInfo.phone}</p>
-                                        <p className="text-sm text-gray-600">{contactInfo.phoneDescription}</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-4">
+                                    <h3 className="font-semibold text-gray-900">Điện thoại</h3>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Số điện thoại
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contactInfo.phone}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
+                                            className="input w-full"
+                                            placeholder="Nhập số điện thoại"
+                                        />
                                     </div>
-
-                                    <div className="text-center p-6 bg-green-50 rounded-lg">
-                                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Mail className="w-6 h-6 text-green-600" />
-                                        </div>
-                                        <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
-                                        <p className="text-lg font-bold text-green-600 mb-1">{contactInfo.email}</p>
-                                        <p className="text-sm text-gray-600">{contactInfo.emailDescription}</p>
-                                    </div>
-
-                                    <div className="text-center p-6 bg-purple-50 rounded-lg">
-                                        <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <MessageCircle className="w-6 h-6 text-purple-600" />
-                                        </div>
-                                        <h3 className="font-semibold text-gray-900 mb-2">Telegram</h3>
-                                        <p className="text-lg font-bold text-purple-600 mb-1">{contactInfo.telegram}</p>
-                                        <p className="text-sm text-gray-600">{contactInfo.telegramDescription}</p>
-                                    </div>
-
-                                    <div className="text-center p-6 bg-orange-50 rounded-lg">
-                                        <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <MapPin className="w-6 h-6 text-orange-600" />
-                                        </div>
-                                        <h3 className="font-semibold text-gray-900 mb-2">Địa chỉ</h3>
-                                        <p className="text-lg font-bold text-orange-600 mb-1">{contactInfo.address}</p>
-                                        <p className="text-sm text-gray-600">{contactInfo.addressDescription}</p>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Mô tả
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contactInfo.phoneDescription}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, phoneDescription: e.target.value })}
+                                            className="input w-full"
+                                            placeholder="Ví dụ: Hỗ trợ 24/7"
+                                        />
                                     </div>
                                 </div>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-4">
-                                        <h3 className="font-semibold text-gray-900">Điện thoại</h3>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Số điện thoại
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={contactInfo.phone}
-                                                onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
-                                                className="input w-full"
-                                                placeholder="Nhập số điện thoại"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Mô tả
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={contactInfo.phoneDescription}
-                                                onChange={(e) => setContactInfo({ ...contactInfo, phoneDescription: e.target.value })}
-                                                className="input w-full"
-                                                placeholder="Ví dụ: Hỗ trợ 24/7"
-                                            />
-                                        </div>
-                                    </div>
 
-                                    <div className="space-y-4">
-                                        <h3 className="font-semibold text-gray-900">Email</h3>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Địa chỉ email
-                                            </label>
-                                            <input
-                                                type="email"
-                                                value={contactInfo.email}
-                                                onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
-                                                className="input w-full"
-                                                placeholder="Nhập email"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Mô tả
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={contactInfo.emailDescription}
-                                                onChange={(e) => setContactInfo({ ...contactInfo, emailDescription: e.target.value })}
-                                                className="input w-full"
-                                                placeholder="Ví dụ: Phản hồi trong 24h"
-                                            />
-                                        </div>
+                                <div className="space-y-4">
+                                    <h3 className="font-semibold text-gray-900">Email</h3>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Địa chỉ email
+                                        </label>
+                                        <input
+                                            type="email"
+                                            value={contactInfo.email}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
+                                            className="input w-full"
+                                            placeholder="Nhập email"
+                                        />
                                     </div>
-
-                                    <div className="space-y-4">
-                                        <h3 className="font-semibold text-gray-900">Telegram</h3>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Username Telegram
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={contactInfo.telegram}
-                                                onChange={(e) => setContactInfo({ ...contactInfo, telegram: e.target.value })}
-                                                className="input w-full"
-                                                placeholder="Ví dụ: @dichvuzalo"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Mô tả
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={contactInfo.telegramDescription}
-                                                onChange={(e) => setContactInfo({ ...contactInfo, telegramDescription: e.target.value })}
-                                                className="input w-full"
-                                                placeholder="Ví dụ: Hỗ trợ nhanh nhất"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <h3 className="font-semibold text-gray-900">Địa chỉ</h3>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Địa chỉ
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={contactInfo.address}
-                                                onChange={(e) => setContactInfo({ ...contactInfo, address: e.target.value })}
-                                                className="input w-full"
-                                                placeholder="Ví dụ: Hà Nội, Việt Nam"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Mô tả
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={contactInfo.addressDescription}
-                                                onChange={(e) => setContactInfo({ ...contactInfo, addressDescription: e.target.value })}
-                                                className="input w-full"
-                                                placeholder="Ví dụ: Trụ sở chính"
-                                            />
-                                        </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Mô tả
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contactInfo.emailDescription}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, emailDescription: e.target.value })}
+                                            className="input w-full"
+                                            placeholder="Ví dụ: Phản hồi trong 24h"
+                                        />
                                     </div>
                                 </div>
-                            )}
+
+                                <div className="space-y-4">
+                                    <h3 className="font-semibold text-gray-900">Telegram</h3>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Username Telegram
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contactInfo.telegram}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, telegram: e.target.value })}
+                                            className="input w-full"
+                                            placeholder="Ví dụ: @dichvuzalo"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Mô tả
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contactInfo.telegramDescription}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, telegramDescription: e.target.value })}
+                                            className="input w-full"
+                                            placeholder="Ví dụ: Hỗ trợ nhanh nhất"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <h3 className="font-semibold text-gray-900">Địa chỉ</h3>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Địa chỉ
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contactInfo.address}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, address: e.target.value })}
+                                            className="input w-full"
+                                            placeholder="Ví dụ: Hà Nội, Việt Nam"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Mô tả
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contactInfo.addressDescription}
+                                            onChange={(e) => setContactInfo({ ...contactInfo, addressDescription: e.target.value })}
+                                            className="input w-full"
+                                            placeholder="Ví dụ: Trụ sở chính"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -383,7 +388,6 @@ const AdminContactPage = () => {
                         <div className="flex flex-col sm:flex-row gap-4 mb-6">
                             <div className="flex-1">
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                                     <input
                                         type="text"
                                         placeholder="Tìm kiếm tin nhắn..."
@@ -477,7 +481,10 @@ const AdminContactPage = () => {
                                 <h2 className="text-lg font-semibold text-gray-900">Câu Hỏi Thường Gặp</h2>
                                 <p className="text-sm text-gray-600">Quản lý câu hỏi và câu trả lời</p>
                             </div>
-                            <button className="btn btn-primary btn-sm bg-red-600 hover:bg-red-700 text-white">
+                            <button
+                                onClick={() => openFaqModal()}
+                                className="btn btn-primary btn-sm bg-red-600 hover:bg-red-700 text-white"
+                            >
                                 <Plus className="w-4 h-4 mr-2" />
                                 Thêm câu hỏi
                             </button>
@@ -493,16 +500,130 @@ const AdminContactPage = () => {
                                             <p className="text-gray-600">{faq.answer}</p>
                                         </div>
                                         <div className="flex space-x-2 ml-4">
-                                            <button className="btn btn-sm btn-outline">
+                                            <button
+                                                onClick={() => openFaqModal(faq)}
+                                                className="btn btn-sm btn-outline"
+                                            >
                                                 <Edit className="w-4 h-4" />
                                             </button>
-                                            <button className="btn btn-sm btn-outline text-red-600">
+                                            <button
+                                                onClick={() => openDeleteModal(faq)}
+                                                className="btn btn-sm btn-outline text-red-600"
+                                            >
                                                 <Trash className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* FAQ Modal */}
+            {showFaqModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                {editingFaq ? 'Chỉnh sửa câu hỏi' : 'Thêm câu hỏi mới'}
+                            </h3>
+                            <button
+                                onClick={closeFaqModal}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleFaqSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Câu hỏi *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={faqForm.question}
+                                    onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value })}
+                                    className="input w-full"
+                                    placeholder="Nhập câu hỏi..."
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Câu trả lời *
+                                </label>
+                                <textarea
+                                    value={faqForm.answer}
+                                    onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value })}
+                                    rows={4}
+                                    className="input w-full"
+                                    placeholder="Nhập câu trả lời..."
+                                    required
+                                ></textarea>
+                            </div>
+
+                            <div className="flex justify-end space-x-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={closeFaqModal}
+                                    className="btn btn-outline btn-sm"
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary btn-sm bg-red-600 hover:bg-red-700 text-white"
+                                >
+                                    {editingFaq ? 'Cập nhật' : 'Thêm mới'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Xác nhận xóa
+                            </h3>
+                            <button
+                                onClick={closeDeleteModal}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="mb-6">
+                            <p className="text-gray-600 mb-2">
+                                Bạn có chắc chắn muốn xóa câu hỏi này?
+                            </p>
+                            <p className="font-medium text-gray-900">
+                                &ldquo;{deletingFaq?.question}&rdquo;
+                            </p>
+                        </div>
+
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={closeDeleteModal}
+                                className="btn btn-outline btn-sm"
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={handleDeleteFaq}
+                                className="btn btn-primary btn-sm bg-red-600 hover:bg-red-700 text-white"
+                            >
+                                Xóa
+                            </button>
                         </div>
                     </div>
                 </div>
