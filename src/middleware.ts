@@ -12,13 +12,14 @@ const publicRoutes = [
 
 // Routes that require authentication
 const protectedRoutes = [
-    '/services',
-    '/recharge',
-    '/invoices',
-    '/guide',
-    '/contact',
-    '/proxy-list',
-    '/purchase-history'
+  '/dashboard',
+  '/services',
+  '/recharge',
+  '/invoices',
+  '/guide',
+  '/contact',
+  '/proxy-list',
+  '/purchase-history'
 ];
 
 export function middleware(request: NextRequest) {

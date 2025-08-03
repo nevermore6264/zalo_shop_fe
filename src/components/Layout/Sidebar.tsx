@@ -4,8 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
+    Home,
     ShoppingCart,
-    CreditCard,
     RefreshCw,
     Building2,
     FileText,
@@ -21,6 +21,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
     const pathname = usePathname();
 
     const menuItems = [
+        // Dashboard Section
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+            icon: Home,
+        },
+
         // Services Section
         {
             title: 'Dịch Vụ Zalo',

@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import MainLayout from "@/components/Layout/MainLayout";
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import MainLayout from '@/components/Layout/MainLayout'
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: {
@@ -85,36 +85,27 @@ export const metadata: Metadata = {
     'theme-color': '#3B82F6',
     'color-scheme': 'light',
   },
-};
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="vi">
       <head>
-        {/* Favicon */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-        {/* Manifest */}
         <link rel="manifest" href="/manifest.json" />
 
-        {/* Preconnect to external domains for performance */}
+        {/* Preconnect for performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-
-        {/* DNS Prefetch for external resources */}
         <link rel="dns-prefetch" href="//api.qrserver.com" />
 
-        {/* Security Headers */}
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-
-        {/* Structured Data */}
+        {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -125,10 +116,6 @@ export default function RootLayout({
               "url": "https://zaloshop.com",
               "logo": "https://zaloshop.com/icon.svg",
               "description": "Cung cấp các dịch vụ Zalo, tài khoản, proxy chất lượng cao",
-              "address": {
-                "@type": "PostalAddress",
-                "addressCountry": "VN"
-              },
               "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "customer service",
@@ -143,10 +130,8 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <MainLayout>
-          {children}
-        </MainLayout>
+        {children}
       </body>
     </html>
-  );
+  )
 }
