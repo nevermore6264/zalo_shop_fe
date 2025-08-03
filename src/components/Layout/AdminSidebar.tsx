@@ -89,40 +89,6 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen }) => {
             href: '/admin/user-stats',
             icon: BarChart3,
         },
-        {
-            title: 'Hoạt động hệ thống',
-            href: '/admin/activity',
-            icon: Activity,
-        },
-
-        // System Section
-        {
-            title: 'HỆ THỐNG',
-            href: '#',
-            icon: null,
-            isHeader: true,
-        },
-        {
-            title: 'Cài đặt hệ thống',
-            href: '/admin/settings',
-            icon: Settings,
-        },
-        {
-            title: 'Quản lý tài khoản',
-            href: '/admin/accounts',
-            icon: Database,
-        },
-        {
-            title: 'Bảo mật',
-            href: '/admin/security',
-            icon: Shield,
-        },
-        {
-            title: 'Nhật ký hệ thống',
-            href: '/admin/logs',
-            icon: FileText,
-        },
-
         // Support Section
         {
             title: 'HỖ TRỢ',
@@ -131,19 +97,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen }) => {
             isHeader: true,
         },
         {
-            title: 'Tin nhắn khách hàng',
-            href: '/admin/messages',
-            icon: MessageCircle,
-        },
-        {
             title: 'Quản lý liên hệ',
             href: '/admin/contact',
             icon: MessageCircle,
-        },
-        {
-            title: 'Thông báo',
-            href: '/admin/notifications',
-            icon: Bell,
         },
     ];
 
