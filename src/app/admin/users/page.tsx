@@ -147,55 +147,52 @@ const AdminUsersPage = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="card">
-                    <div className="flex items-center">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-gray-600 mb-1">Tổng người dùng</p>
+                            <p className="text-3xl font-bold text-gray-900">{users.length}</p>
+                        </div>
                         <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                             <Users className="w-6 h-6 text-blue-600" />
                         </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Tổng người dùng</p>
-                            <p className="text-2xl font-bold text-gray-900">{users.length}</p>
-                        </div>
                     </div>
                 </div>
 
-                <div className="card">
-                    <div className="flex items-center">
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                            <CheckCircle className="w-6 h-6 text-green-600" />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Đang hoạt động</p>
-                            <p className="text-2xl font-bold text-gray-900">
+                <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-gray-600 mb-1">Đang hoạt động</p>
+                            <p className="text-3xl font-bold text-gray-900">
                                 {users.filter(u => u.status === 'active').length}
                             </p>
                         </div>
+                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <CheckCircle className="w-6 h-6 text-green-600" />
+                        </div>
                     </div>
                 </div>
 
-                <div className="card">
-                    <div className="flex items-center">
-                        <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                            <Shield className="w-6 h-6 text-purple-600" />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Admin</p>
-                            <p className="text-2xl font-bold text-gray-900">
+                <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-gray-600 mb-1">Admin</p>
+                            <p className="text-3xl font-bold text-gray-900">
                                 {users.filter(u => u.role === 'admin').length}
                             </p>
                         </div>
+                        <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <Shield className="w-6 h-6 text-purple-600" />
+                        </div>
                     </div>
                 </div>
 
-                <div className="card">
-                    <div className="flex items-center">
-                        <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                            <User className="w-6 h-6 text-orange-600" />
-                        </div>
-                        <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-600">Người dùng mới</p>
-                            <p className="text-2xl font-bold text-gray-900">
+                <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-gray-600 mb-1">Người dùng mới</p>
+                            <p className="text-3xl font-bold text-gray-900">
                                 {users.filter(u => {
                                     const joinDate = new Date(u.joinDate);
                                     const now = new Date();
@@ -203,6 +200,9 @@ const AdminUsersPage = () => {
                                     return diffDays <= 7;
                                 }).length}
                             </p>
+                        </div>
+                        <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                            <User className="w-6 h-6 text-orange-600" />
                         </div>
                     </div>
                 </div>
@@ -276,8 +276,6 @@ const AdminUsersPage = () => {
                                     <th className="p-4 text-left">Trạng thái</th>
                                     <th className="p-4 text-left">Ngày tham gia</th>
                                     <th className="p-4 text-left">Đăng nhập cuối</th>
-                                    <th className="p-4 text-right">Đơn hàng</th>
-                                    <th className="p-4 text-right">Tổng chi tiêu</th>
                                     <th className="p-4 text-left">Thao tác</th>
                                 </tr>
                             </thead>
@@ -303,7 +301,7 @@ const AdminUsersPage = () => {
                                             </div>
                                         </td>
                                         <td className="p-4">
-                                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleColor(user.role)}`}>
+                                            <span className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full whitespace-nowrap ${getRoleColor(user.role)}`}>
                                                 {user.role === 'admin' ? 'Admin' : 'Người dùng'}
                                             </span>
                                         </td>
@@ -325,12 +323,6 @@ const AdminUsersPage = () => {
                                         <td className="p-4 text-sm text-gray-600">
                                             <div>{user.lastLogin.split(' ')[0]}</div>
                                             <div className="text-xs text-gray-500">{user.lastLogin.split(' ')[1]}</div>
-                                        </td>
-                                        <td className="p-4 text-sm text-gray-600 text-right">
-                                            {user.totalOrders}
-                                        </td>
-                                        <td className="p-4 text-sm text-gray-600 text-right">
-                                            {formatCurrency(user.totalSpent)}
                                         </td>
                                         <td className="p-4">
                                             <div className="flex items-center space-x-1">

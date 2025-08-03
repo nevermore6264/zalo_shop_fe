@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
     Copy,
@@ -15,7 +15,7 @@ import {
     Plus
 } from 'lucide-react';
 
-const ProxyListPage = () => {
+const ProxyListContent = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'static' | 'dynamic'>('static');
@@ -105,32 +105,29 @@ const ProxyListPage = () => {
             </div>
 
             {/* Controls */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-                <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-700">Show</span>
-                    <select
-                        value={showEntries}
-                        onChange={(e) => setShowEntries(Number(e.target.value))}
-                        className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={50}>50</option>
-                        <option value={100}>100</option>
-                    </select>
-                    <span className="text-sm text-gray-700">entries</span>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-700">Search:</span>
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                        <span className="text-sm text-gray-700">Show entries:</span>
+                        <select
+                            value={showEntries}
+                            onChange={(e) => setShowEntries(Number(e.target.value))}
+                            className="border border-gray-300 rounded px-2 py-1 text-sm"
+                        >
+                            <option value={10}>10</option>
+                            <option value={25}>25</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                        </select>
+                    </div>
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <input
                             type="text"
+                            placeholder="Search..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Tìm kiếm..."
-                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                     </div>
                 </div>
@@ -138,29 +135,29 @@ const ProxyListPage = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-2">
-                <button className="btn btn-outline btn-sm flex items-center space-x-2">
-                    <Plus className="w-4 h-4" />
-                    <span>Nhập nhiều IP Allow</span>
+                <button className="btn btn-outline btn-sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Nhập nhiều IP Allow
                 </button>
-                <button className="btn btn-outline btn-sm flex items-center space-x-2">
-                    <Download className="w-4 h-4" />
-                    <span>Lấy với IP Allow</span>
+                <button className="btn btn-outline btn-sm">
+                    <Download className="w-4 h-4 mr-2" />
+                    Lấy với IP Allow
                 </button>
-                <button className="btn btn-primary btn-sm flex items-center space-x-2">
-                    <Copy className="w-4 h-4" />
-                    <span>Sao chép nhiều</span>
+                <button className="btn btn-outline btn-sm">
+                    <Copy className="w-4 h-4 mr-2" />
+                    Sao chép nhiều
                 </button>
-                <button className="btn btn-success btn-sm flex items-center space-x-2">
-                    <Download className="w-4 h-4" />
-                    <span>Lấy nhiều</span>
+                <button className="btn btn-outline btn-sm">
+                    <Download className="w-4 h-4 mr-2" />
+                    Lấy nhiều
                 </button>
-                <button className="btn btn-warning btn-sm flex items-center space-x-2">
-                    <RefreshCw className="w-4 h-4" />
-                    <span>Gia hạn nhiều</span>
+                <button className="btn btn-outline btn-sm">
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Gia hạn nhiều
                 </button>
-                <button className="btn btn-error btn-sm flex items-center space-x-2">
-                    <Trash2 className="w-4 h-4" />
-                    <span>Xoá nhiều</span>
+                <button className="btn btn-outline btn-sm text-red-600">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Xoá nhiều
                 </button>
             </div>
 
@@ -168,91 +165,53 @@ const ProxyListPage = () => {
             <div className="card">
                 <div className="card-body p-0">
                     <div className="overflow-x-auto">
-                        <table className="table table-zebra w-full">
+                        <table className="table w-full">
                             <thead>
                                 <tr className="bg-gray-50">
                                     <th className="p-4 text-left">
-                                        <input type="checkbox" className="checkbox checkbox-sm" />
+                                        <input type="checkbox" className="checkbox" />
                                     </th>
-                                    <th className="p-4 text-left font-medium text-gray-700 cursor-pointer hover:bg-gray-100">
-                                        <div className="flex items-center space-x-1">
-                                            <span>Gói</span>
-                                            <ChevronDown className="w-4 h-4" />
-                                        </div>
-                                    </th>
-                                    <th className="p-4 text-left font-medium text-gray-700 cursor-pointer hover:bg-gray-100">
-                                        <div className="flex items-center space-x-1">
-                                            <span>Nhà mạng</span>
-                                            <ChevronDown className="w-4 h-4" />
-                                        </div>
-                                    </th>
-                                    <th className="p-4 text-left font-medium text-gray-700 cursor-pointer hover:bg-gray-100">
-                                        <div className="flex items-center space-x-1">
-                                            <span>Proxy HTTP</span>
-                                            <ChevronDown className="w-4 h-4" />
-                                        </div>
-                                    </th>
-                                    <th className="p-4 text-left font-medium text-gray-700 cursor-pointer hover:bg-gray-100">
-                                        <div className="flex items-center space-x-1">
-                                            <span>Loại</span>
-                                            <ChevronDown className="w-4 h-4" />
-                                        </div>
-                                    </th>
-                                    <th className="p-4 text-left font-medium text-gray-700 cursor-pointer hover:bg-gray-100">
-                                        <div className="flex items-center space-x-1">
-                                            <span>Hết hạn</span>
-                                            <ChevronDown className="w-4 h-4" />
-                                        </div>
-                                    </th>
-                                    <th className="p-4 text-left font-medium text-gray-700">
-                                        Thao tác
-                                    </th>
+                                    <th className="p-4 text-left">Gói</th>
+                                    <th className="p-4 text-left">Nhà mạng</th>
+                                    <th className="p-4 text-left">Proxy HTTP</th>
+                                    <th className="p-4 text-left">Loại</th>
+                                    <th className="p-4 text-left">Hết hạn</th>
+                                    <th className="p-4 text-left">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentData.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={7} className="p-8 text-center text-gray-500">
-                                            No data available in table
+                                {currentData.map((proxy) => (
+                                    <tr key={proxy.id} className="hover:bg-gray-50 border-b">
+                                        <td className="p-4">
+                                            <input type="checkbox" className="checkbox" />
+                                        </td>
+                                        <td className="p-4 font-medium">{proxy.package}</td>
+                                        <td className="p-4">{proxy.network}</td>
+                                        <td className="p-4 font-mono text-sm">{proxy.httpProxy}</td>
+                                        <td className="p-4">
+                                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                                                {proxy.type}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 text-sm text-gray-600">{proxy.expires}</td>
+                                        <td className="p-4">
+                                            <div className="flex items-center space-x-2">
+                                                <button className="btn btn-sm btn-outline" title="Xem chi tiết">
+                                                    <Eye className="w-4 h-4" />
+                                                </button>
+                                                <button className="btn btn-sm btn-outline" title="Chỉnh sửa">
+                                                    <Edit className="w-4 h-4" />
+                                                </button>
+                                                <button className="btn btn-sm btn-outline" title="Sao chép">
+                                                    <Copy className="w-4 h-4" />
+                                                </button>
+                                                <button className="btn btn-sm btn-outline text-red-600" title="Xóa">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
-                                ) : (
-                                    currentData.map((proxy) => (
-                                        <tr key={proxy.id} className="hover:bg-gray-50">
-                                            <td className="p-4">
-                                                <input type="checkbox" className="checkbox checkbox-sm" />
-                                            </td>
-                                            <td className="p-4 font-medium">{proxy.package}</td>
-                                            <td className="p-4">{proxy.network}</td>
-                                            <td className="p-4 font-mono text-sm">{proxy.httpProxy}</td>
-                                            <td className="p-4">
-                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${proxy.type === 'HTTP'
-                                                    ? 'bg-blue-100 text-blue-800'
-                                                    : 'bg-green-100 text-green-800'
-                                                    }`}>
-                                                    {proxy.type}
-                                                </span>
-                                            </td>
-                                            <td className="p-4">{proxy.expires}</td>
-                                            <td className="p-4">
-                                                <div className="flex items-center space-x-2">
-                                                    <button className="p-1 hover:bg-gray-100 rounded" title="Xem">
-                                                        <Eye className="w-4 h-4 text-blue-600" />
-                                                    </button>
-                                                    <button className="p-1 hover:bg-gray-100 rounded" title="Sửa">
-                                                        <Edit className="w-4 h-4 text-green-600" />
-                                                    </button>
-                                                    <button className="p-1 hover:bg-gray-100 rounded" title="Sao chép">
-                                                        <Copy className="w-4 h-4 text-orange-600" />
-                                                    </button>
-                                                    <button className="p-1 hover:bg-gray-100 rounded" title="Xóa">
-                                                        <Trash2 className="w-4 h-4 text-red-600" />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
+                                ))}
                             </tbody>
                         </table>
                     </div>
@@ -260,20 +219,29 @@ const ProxyListPage = () => {
             </div>
 
             {/* Pagination */}
-            <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-700">
-                    Showing 0 to 0 of 0 entries
+                    Showing <span className="font-medium">1</span> to <span className="font-medium">{currentData.length}</span> of <span className="font-medium">{currentData.length}</span> results
                 </div>
                 <div className="flex items-center space-x-2">
-                    <button className="btn btn-outline btn-sm" disabled>
-                        Previous
-                    </button>
-                    <button className="btn btn-outline btn-sm" disabled>
-                        Next
-                    </button>
+                    <button className="btn btn-outline btn-sm">Previous</button>
+                    <button className="btn btn-primary btn-sm">1</button>
+                    <button className="btn btn-outline btn-sm">Next</button>
                 </div>
             </div>
         </div>
+    );
+};
+
+const ProxyListPage = () => {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+        }>
+            <ProxyListContent />
+        </Suspense>
     );
 };
 
