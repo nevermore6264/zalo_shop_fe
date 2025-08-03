@@ -179,11 +179,10 @@ const ProxyServicesPage = () => {
                                     </div>
                                 </div>
                             </div>
-
                             {/* Subtitle for static plans */}
-                            {activeTab === 'static' && plan.subtitle && (
+                            {activeTab === 'static' && 'subtitle' in plan && (
                                 <div className="text-sm text-gray-600 font-medium">
-                                    {plan.subtitle}
+                                    {String(plan.subtitle)}
                                 </div>
                             )}
 
