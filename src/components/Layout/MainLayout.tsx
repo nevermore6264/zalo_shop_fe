@@ -51,12 +51,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             )}
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col overflow-hidden transition-all duration-300">
+            <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${sidebarOpen && !isMobile ? 'lg:ml-72' : 'ml-0'
+                }`}>
                 {/* Header */}
                 <Header onMenuClick={toggleSidebar} />
 
                 {/* Content */}
-                <main className="flex-1 overflow-y-auto p-6 transition-all duration-300">
+                <main className="flex-1 overflow-y-auto p-4 lg:p-6 transition-all duration-300">
                     <div className="container mx-auto max-w-7xl">
                         <div className="animate-fade-in">
                             {children}

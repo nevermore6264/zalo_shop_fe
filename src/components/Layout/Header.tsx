@@ -1,13 +1,45 @@
 'use client';
 
-import React from 'react';
-import { Menu, Bell, User, Search, Settings } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Menu, Bell, User, Search, Settings, LogOut, ChevronDown } from 'lucide-react';
 
 interface HeaderProps {
     onMenuClick: () => void;
 }
 
+interface UserData {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+}
+
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+    const router = useRouter();
+    const [user, setUser] = useState<UserData | null>(null);
+    const [showUserMenu, setShowUserMenu] = useState(false);
+
+    useEffect(() => {
+        // Get user data from localStorage
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            setUser(JSON.parse(userData));
+        }
+    }, []);
+
+    const handleLogout = () => {
+        // Clear localStorage
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+
+        // Clear cookie
+        document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+
+        // Redirect to login
+        router.push('/login');
+    };
+
     return (
         <header className="bg-white/80 backdrop-blur-md shadow-lg border-b border-gray-200/50 px-6 py-4 sticky top-0 z-20">
             <div className="flex items-center justify-between">
@@ -35,17 +67,47 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                     </button>
 
                     {/* User menu */}
-                    <div className="flex items-center space-x-3">
-                        <div className="text-right hidden sm:block">
-                            <div className="text-sm font-semibold text-gray-900">Admin User</div>
-                            <div className="text-xs text-gray-500">admin@zaloshop.com</div>
-                        </div>
-                        <button className="p-2 rounded-xl hover:bg-orange-50 hover:text-orange-600 transition-all duration-300 group">
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowUserMenu(!showUserMenu)}
+                            className="flex items-center space-x-3 p-2 rounded-xl hover:bg-orange-50 hover:text-orange-600 transition-all duration-300 group"
+                        >
+                            <div className="text-right hidden sm:block">
+                                <div className="text-sm font-semibold text-gray-900">
+                                    {user?.name || 'Guest User'}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                    {user?.email || 'guest@example.com'}
+                                </div>
+                            </div>
                             <div className="relative">
                                 <User className="w-5 h-5 text-gray-600 group-hover:scale-110 transition-transform duration-300" />
                                 <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></div>
                             </div>
+                            <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''
+                                }`} />
                         </button>
+
+                        {/* User Dropdown Menu */}
+                        {showUserMenu && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                                <div className="px-4 py-2 border-b border-gray-100">
+                                    <div className="text-sm font-medium text-gray-900">
+                                        {user?.name || 'Guest User'}
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                        {user?.email || 'guest@example.com'}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2 transition-colors duration-200"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    <span>Đăng xuất</span>
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
