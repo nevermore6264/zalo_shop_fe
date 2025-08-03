@@ -12,14 +12,18 @@ const publicRoutes = [
 
 // Routes that require authentication
 const protectedRoutes = [
-  '/dashboard',
-  '/services',
-  '/recharge',
-  '/invoices',
-  '/guide',
-  '/contact',
-  '/proxy-list',
-  '/purchase-history'
+    '/dashboard',
+    '/services',
+    '/recharge',
+    '/invoices',
+    '/guide',
+    '/contact',
+    '/proxy-list',
+    '/purchase-history'
+];
+
+const adminRoutes = [
+    '/admin'
 ];
 
 export function middleware(request: NextRequest) {
@@ -27,6 +31,11 @@ export function middleware(request: NextRequest) {
 
     // Check if the current path is a protected route
     const isProtectedRoute = protectedRoutes.some(route =>
+        pathname.startsWith(route)
+    );
+
+    // Check if the current path is an admin route
+    const isAdminRoute = adminRoutes.some(route =>
         pathname.startsWith(route)
     );
 
@@ -42,6 +51,13 @@ export function middleware(request: NextRequest) {
 
     // If accessing protected route without token, redirect to login
     if (isProtectedRoute && !token) {
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(loginUrl);
+    }
+
+    // If accessing admin route without token, redirect to login
+    if (isAdminRoute && !token) {
         const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('redirect', pathname);
         return NextResponse.redirect(loginUrl);

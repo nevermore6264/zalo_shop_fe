@@ -42,8 +42,12 @@ const LoginPage = () => {
             // Set cookie for middleware
             document.cookie = `auth_token=${mockToken}; path=/; max-age=86400; SameSite=Strict`;
 
-            // Redirect to original URL or dashboard
-            router.push(redirectUrl);
+            // Redirect based on role
+            if (mockUser.role === 'admin') {
+                router.push('/admin');
+            } else {
+                router.push(redirectUrl);
+            }
         } catch (error) {
             console.error('Login failed:', error);
             alert('Đăng nhập thất bại. Vui lòng thử lại.');

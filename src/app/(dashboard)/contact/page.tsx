@@ -322,22 +322,6 @@ const ContactPage = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Map Placeholder */}
-                    <div className="card">
-                        <div className="card-header">
-                            <h3 className="text-lg font-semibold text-gray-900">Vị trí</h3>
-                        </div>
-                        <div className="card-body p-0">
-                            <div className="h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                                <div className="text-center">
-                                    <MapPin className="w-12 h-12 text-blue-600 mx-auto mb-2" />
-                                    <p className="text-blue-800 font-medium">Hà Nội, Việt Nam</p>
-                                    <p className="text-blue-600 text-sm">Trụ sở chính</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
