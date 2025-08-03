@@ -136,6 +136,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen }) => {
             icon: MessageCircle,
         },
         {
+            title: 'Quản lý liên hệ',
+            href: '/admin/contact',
+            icon: MessageCircle,
+        },
+        {
             title: 'Thông báo',
             href: '/admin/notifications',
             icon: Bell,
