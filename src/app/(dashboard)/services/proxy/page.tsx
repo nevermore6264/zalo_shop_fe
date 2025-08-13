@@ -1,244 +1,189 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
-    Check,
-    ShoppingCart,
-    Clock,
     Wifi,
     Server,
+    Globe,
     Home,
-    Building
+    ExternalLink,
+    Shield,
+    Zap,
+    Users
 } from 'lucide-react';
 
 const ProxyServicesPage = () => {
-    const [activeTab, setActiveTab] = useState<'dynamic' | 'static'>('dynamic');
-
-    // Dynamic proxy plans
-    const dynamicPlans = [
+    const proxyTypes = [
         {
             id: 1,
-            title: 'Min 1 phút',
-            price: 10000,
-            features: [
-                'Hỗ trợ HTTP/SOCKS5',
-                'Qua 1 phút được đổi IP khác',
-                '1 IP sống được 30 phút',
-                'Đổi IP không giới hạn',
-                'Sử dụng số lượng có thương lượng giá'
-            ]
+            title: 'Proxy IPV4 Tĩnh',
+            description: 'Static IPv4 Proxy',
+            icon: <Server className="w-8 h-8" />,
+            color: 'from-blue-500 to-blue-600',
+            bgColor: 'bg-blue-50',
+            borderColor: 'border-blue-200',
+            link: 'https://proxy.biz.vn/?home=muaproxy'
         },
         {
             id: 2,
-            title: 'Min 2 phút',
-            price: 8000,
-            features: [
-                'Hỗ trợ HTTP/SOCKS5',
-                'Qua 2 phút được đổi IP khác',
-                '1 IP sống được 30 phút',
-                'Đổi IP không giới hạn',
-                'Sử dụng số lượng có thương lượng giá'
-            ]
+            title: 'Gói Proxy IPV4 Tĩnh',
+            description: 'Static IPv4 Proxy Package',
+            icon: <Wifi className="w-8 h-8" />,
+            color: 'from-green-500 to-green-600',
+            bgColor: 'bg-green-50',
+            borderColor: 'border-green-200',
+            link: 'https://proxy.biz.vn/?home=combo'
         },
         {
             id: 3,
-            title: 'Min 4 phút',
-            price: 6000,
-            features: [
-                'Hỗ trợ HTTP/SOCKS5',
-                'Qua 4 phút được đổi IP khác',
-                '1 IP sống được 30 phút',
-                'Đổi IP không giới hạn',
-                'Sử dụng số lượng có thương lượng giá'
-            ]
+            title: 'Key Proxy Xoay IPV4',
+            description: 'Rotating IPv4 Proxy Key',
+            icon: <Zap className="w-8 h-8" />,
+            color: 'from-purple-500 to-purple-600',
+            bgColor: 'bg-purple-50',
+            borderColor: 'border-purple-200',
+            link: 'https://proxy.biz.vn/?home=proxyxoay'
         },
         {
             id: 4,
-            title: 'Giữ IP lâu',
-            price: 13000,
-            features: [
-                'Hỗ trợ HTTP/SOCKS5',
-                'Qua 4 phút được đổi IP khác',
-                'Không giới hạn thời gian',
-                'Đổi IP không giới hạn',
-                'Sử dụng số lượng có thương lượng giá'
-            ]
-        },
-        {
-            id: 5,
-            title: 'Vip 30 giây',
-            price: 20000,
-            features: [
-                'Hỗ trợ HTTP/SOCKS5',
-                'Qua 30 giây được đổi IP khác',
-                '1 IP sống được 30 phút',
-                'Đổi IP không giới hạn',
-                'Sử dụng số lượng có thương lượng giá'
-            ]
+            title: 'Proxy IPV6 Dân Cư Tĩnh',
+            description: 'Residential IPv6 Proxy Static',
+            icon: <Home className="w-8 h-8" />,
+            color: 'from-orange-500 to-orange-600',
+            bgColor: 'bg-orange-50',
+            borderColor: 'border-orange-200',
+            link: 'https://proxy.biz.vn/?home=muaipv6'
         }
     ];
 
-    // Static proxy plans
-    const staticPlans = [
-        {
-            id: 1,
-            title: 'Dân cư',
-            subtitle: 'Viettel, FPT, VNPT',
-            price: 1000,
-            features: [
-                'Proxy dân cư ipv4 Việt Nam tĩnh',
-                'Nói không với cheat độ ổn định cao',
-                'Không giới hạn dung lượng sử dụng',
-                'Đã ký hợp đồng dài hạn với Viettel, VNPT, FPT',
-                'Thời gian mua càng lâu giá càng rẻ có gia hạn'
-            ]
-        },
-        {
-            id: 2,
-            title: 'Datacenter',
-            subtitle: 'Việt Nam',
-            price: 1000,
-            features: [
-                'Proxy dân cư ipv4 Việt Nam tĩnh',
-                'Nói không với cheat độ ổn định cao',
-                'Không giới hạn dung lượng sử dụng',
-                'Đã ký hợp đồng dài hạn với Viettel, VNPT, FPT',
-                'Thời gian mua càng lâu giá càng rẻ có gia hạn'
-            ]
-        }
-    ];
-
-    const currentPlans = activeTab === 'dynamic' ? dynamicPlans : staticPlans;
+    const handleProxyClick = (link: string) => {
+        window.open(link, '_blank', 'noopener,noreferrer');
+    };
 
     return (
-        <div className="space-y-6">
-            {/* Information Banner */}
-            <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
-                <p className="text-yellow-800 text-sm font-medium">
-                    Hướng dẫn cài đặt proxy liên hệ Admin
-                </p>
-            </div>
-
+        <div className="space-y-8">
             {/* Header */}
             <div className="text-center space-y-4">
-                <h1 className="text-4xl font-bold text-gray-900">Mua Proxy</h1>
+                <h1 className="text-4xl font-bold text-gray-900">Dịch Vụ Proxy</h1>
                 <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                     Chọn loại proxy phù hợp với nhu cầu sử dụng của bạn.
-                    Hỗ trợ cả proxy động và proxy tĩnh với chất lượng cao.
+                    Tất cả proxy đều được đảm bảo chất lượng cao và ổn định.
                 </p>
             </div>
 
-            {/* Tabs */}
-            <div className="flex justify-center">
-                <div className="bg-gray-100 rounded-lg p-1">
-                    <div className="flex space-x-1">
-                        <button
-                            onClick={() => setActiveTab('dynamic')}
-                            className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center space-x-2 ${activeTab === 'dynamic'
-                                    ? 'bg-white text-blue-600 shadow-md'
-                                    : 'text-gray-600 hover:text-gray-900'
-                                }`}
-                        >
-                            <Clock className="w-5 h-5" />
-                            <span>Mua Proxy Động</span>
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('static')}
-                            className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center space-x-2 ${activeTab === 'static'
-                                    ? 'bg-white text-blue-600 shadow-md'
-                                    : 'text-gray-600 hover:text-gray-900'
-                                }`}
-                        >
-                            <Server className="w-5 h-5" />
-                            <span>Mua Proxy Tĩnh</span>
-                        </button>
-                    </div>
-                </div>
+            {/* Information Banner */}
+            <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
+                <p className="text-yellow-800 text-sm font-medium text-center">
+                    💡 Hướng dẫn cài đặt proxy liên hệ Admin để được hỗ trợ
+                </p>
             </div>
 
-            {/* Plans Grid */}
-            <div className={`grid gap-6 ${activeTab === 'dynamic'
-                    ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'
-                    : 'grid-cols-1 md:grid-cols-2'
-                }`}>
-                {currentPlans.map((plan) => (
-                    <div key={plan.id} className="card hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                        <div className="card-body text-center space-y-6">
-                            {/* Plan Title */}
-                            <div className="relative">
-                                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto shadow-lg">
-                                    {activeTab === 'dynamic' ? (
-                                        <Clock className="w-8 h-8 text-white" />
-                                    ) : (
-                                        <Home className="w-8 h-8 text-white" />
-                                    )}
-                                </div>
-                                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                                    <div className="bg-white px-3 py-1 rounded-full shadow-md border border-gray-200">
-                                        <span className="text-sm font-bold text-gray-800">{plan.title}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            {/* Subtitle for static plans */}
-                            {activeTab === 'static' && 'subtitle' in plan && (
-                                <div className="text-sm text-gray-600 font-medium">
-                                    {String(plan.subtitle)}
-                                </div>
-                            )}
-
-                            {/* Features */}
-                            <div className="space-y-3">
-                                {plan.features.map((feature, index) => (
-                                    <div key={index} className="flex items-start space-x-2 text-left">
-                                        <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                        <span className="text-sm text-gray-700">{feature}</span>
-                                    </div>
-                                ))}
+            {/* Proxy Types Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {proxyTypes.map((proxy) => (
+                    <div
+                        key={proxy.id}
+                        onClick={() => handleProxyClick(proxy.link)}
+                        className={`${proxy.bgColor} ${proxy.borderColor} border-2 rounded-xl p-6 cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-xl group`}
+                    >
+                        <div className="flex items-start space-x-4">
+                            {/* Icon */}
+                            <div className={`bg-gradient-to-r ${proxy.color} p-3 rounded-lg text-white shadow-lg group-hover:shadow-xl transition-all duration-300`}>
+                                {proxy.icon}
                             </div>
 
-                            {/* Price */}
-                            <div className="border-t border-gray-200 pt-4">
-                                <div className="text-3xl font-bold text-blue-600">
-                                    {plan.price.toLocaleString()} VNĐ
+                            {/* Content */}
+                            <div className="flex-1 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-gray-700 transition-colors">
+                                        {proxy.title}
+                                    </h3>
+                                    <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                                 </div>
-                                <div className="text-sm text-gray-500 mt-1">
-                                    {activeTab === 'dynamic' ? 'mỗi tháng' : 'mỗi IP'}
+
+                                <p className="text-gray-600 font-medium">
+                                    {proxy.description}
+                                </p>
+
+                                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                                    <Shield className="w-4 h-4" />
+                                    <span>Bảo mật cao</span>
+                                    <span>•</span>
+                                    <Users className="w-4 h-4" />
+                                    <span>Hỗ trợ 24/7</span>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Buy Button */}
-                            <button className="btn btn-primary w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 rounded-lg transition-all duration-200 transform hover:scale-105">
-                                <ShoppingCart className="w-4 h-4 mr-2" />
-                                Mua Ngay
-                            </button>
+                        {/* Hover effect indicator */}
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-gray-700">
+                                    Nhấp để mua ngay
+                                </span>
+                                <div className="bg-white px-3 py-1 rounded-full text-xs font-medium text-gray-600 group-hover:bg-gray-100 transition-colors">
+                                    Mở tab mới
+                                </div>
+                            </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Additional Information */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            {/* Features Section */}
+            <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-8">
+                <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">
+                    Tại sao chọn dịch vụ proxy của chúng tôi?
+                </h2>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="text-center">
-                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <Wifi className="w-6 h-6 text-blue-600" />
+                    <div className="text-center space-y-3">
+                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                            <Shield className="w-8 h-8 text-blue-600" />
                         </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">Hỗ trợ 24/7</h3>
-                        <p className="text-sm text-gray-600">Đội ngũ hỗ trợ kỹ thuật chuyên nghiệp</p>
+                        <h3 className="font-semibold text-gray-900">Bảo mật tuyệt đối</h3>
+                        <p className="text-sm text-gray-600">
+                            Proxy được mã hóa SSL/TLS, đảm bảo dữ liệu của bạn luôn an toàn
+                        </p>
                     </div>
-                    <div className="text-center">
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <Check className="w-6 h-6 text-green-600" />
+
+                    <div className="text-center space-y-3">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                            <Zap className="w-8 h-8 text-green-600" />
                         </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">Chất lượng cao</h3>
-                        <p className="text-sm text-gray-600">Proxy ổn định, tốc độ nhanh</p>
+                        <h3 className="font-semibold text-gray-900">Tốc độ cao</h3>
+                        <p className="text-sm text-gray-600">
+                            Máy chủ proxy được tối ưu hóa để đạt tốc độ truy cập nhanh nhất
+                        </p>
                     </div>
-                    <div className="text-center">
-                        <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <Building className="w-6 h-6 text-purple-600" />
+
+                    <div className="text-center space-y-3">
+                        <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
+                            <Users className="w-8 h-8 text-purple-600" />
                         </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">Đối tác uy tín</h3>
-                        <p className="text-sm text-gray-600">Hợp tác với các nhà mạng lớn</p>
+                        <h3 className="font-semibold text-gray-900">Hỗ trợ 24/7</h3>
+                        <p className="text-sm text-gray-600">
+                            Đội ngũ kỹ thuật chuyên nghiệp sẵn sàng hỗ trợ mọi lúc
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Additional Info */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <div className="text-center space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                        Cần hỗ trợ thêm?
+                    </h3>
+                    <p className="text-gray-600">
+                        Liên hệ với chúng tôi qua Zalo hoặc email để được tư vấn chi tiết
+                    </p>
+                    <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
+                        <span>📞 Hotline: 1900-xxx-xxx</span>
+                        <span>•</span>
+                        <span>📧 Email: support@example.com</span>
+                        <span>•</span>
+                        <span>💬 Zalo: @support</span>
                     </div>
                 </div>
             </div>

@@ -30,11 +30,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
     const handleLogout = () => {
         // Clear localStorage
-        localStorage.removeItem('auth_token');
+        localStorage.removeItem('token');
         localStorage.removeItem('user');
 
         // Clear cookie
-        document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 
         // Redirect to login
         router.push('/login');

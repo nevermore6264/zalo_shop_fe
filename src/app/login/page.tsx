@@ -5,12 +5,14 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import AuthLayout from '@/components/Layout/AuthLayout';
+import { authService, LoginData } from '@/services/auth';
 
 const LoginForm = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -18,39 +20,57 @@ const LoginForm = () => {
 
     const redirectUrl = searchParams.get('redirect') || '/';
 
+    const validateForm = () => {
+        if (!formData.email) {
+            setError('Email là bắt buộc');
+            return false;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            setError('Email không hợp lệ');
+            return false;
+        }
+
+        if (!formData.password) {
+            setError('Mật khẩu là bắt buộc');
+            return false;
+        }
+
+        return true;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError('');
+
+        if (!validateForm()) {
+            return;
+        }
+
         setIsLoading(true);
 
         try {
-            // Mock login API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // Simulate successful login
-            const mockToken = 'mock_jwt_token_' + Date.now();
-            const mockUser = {
-                id: 1,
-                name: 'Admin User',
+            const loginData: LoginData = {
                 email: formData.email,
-                role: 'admin'
+                password: formData.password
             };
 
-            // Store token in localStorage (in real app, use httpOnly cookies)
-            localStorage.setItem('auth_token', mockToken);
-            localStorage.setItem('user', JSON.stringify(mockUser));
+            const response = await authService.login(loginData);
 
-            // Set cookie for middleware
-            document.cookie = `auth_token=${mockToken}; path=/; max-age=86400; SameSite=Strict`;
+            // Store auth data
+            authService.setAuthData(response.token, response.user);
 
             // Redirect based on role
-            if (mockUser.role === 'admin') {
+            if (response.user.role === 'admin') {
                 router.push('/admin');
             } else {
                 router.push(redirectUrl);
             }
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Login failed:', error);
-            alert('Đăng nhập thất bại. Vui lòng thử lại.');
+            const errorMessage = error instanceof Error ? error.message : 'Đăng nhập thất bại. Vui lòng thử lại.';
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -61,6 +81,11 @@ const LoginForm = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
+
+        // Clear error when user starts typing
+        if (error) {
+            setError('');
+        }
     };
 
     return (
@@ -79,11 +104,18 @@ const LoginForm = () => {
 
                 {/* Login Form */}
                 <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+                    {/* Error Message */}
+                    {error && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-red-600 text-sm">{error}</p>
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Email Field */}
                         <div className="space-y-2">
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Email
+                                Email *
                             </label>
                             <div className="relative">
                                 <input
@@ -102,7 +134,7 @@ const LoginForm = () => {
                         {/* Password Field */}
                         <div className="space-y-2">
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Mật khẩu
+                                Mật khẩu *
                             </label>
                             <div className="relative">
                                 <input
@@ -202,6 +234,7 @@ const LoginForm = () => {
                     <div className="text-xs text-blue-800 space-y-0.5">
                         <p><strong>Email:</strong> admin@zaloshop.com</p>
                         <p><strong>Password:</strong> password123</p>
+                        <p className="text-blue-600 mt-1">* Sử dụng tài khoản demo để test admin panel</p>
                     </div>
                 </div>
             </div>

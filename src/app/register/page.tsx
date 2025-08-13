@@ -5,54 +5,87 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
 import AuthLayout from '@/components/Layout/AuthLayout';
+import { authService, RegisterData } from '@/services/auth';
 
 const RegisterPage = () => {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
-        name: '',
+        username: '',
+        full_name: '',
         email: '',
+        phone: '',
         password: '',
         confirmPassword: ''
     });
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const validateForm = () => {
+        if (!formData.username || formData.username.length < 3) {
+            setError('Username phải có ít nhất 3 ký tự');
+            return false;
+        }
+
+        if (!formData.email) {
+            setError('Email là bắt buộc');
+            return false;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            setError('Email không hợp lệ');
+            return false;
+        }
+
+        if (!formData.password || formData.password.length < 6) {
+            setError('Mật khẩu phải có ít nhất 6 ký tự');
+            return false;
+        }
 
         if (formData.password !== formData.confirmPassword) {
-            alert('Mật khẩu xác nhận không khớp!');
+            setError('Mật khẩu xác nhận không khớp');
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+
+        if (!validateForm()) {
             return;
         }
 
         setIsLoading(true);
 
         try {
-            // Mock register API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // Simulate successful registration
-            const mockToken = 'mock_jwt_token_' + Date.now();
-            const mockUser = {
-                id: 1,
-                name: formData.name,
+            const registerData: RegisterData = {
+                username: formData.username,
                 email: formData.email,
-                role: 'user'
+                password: formData.password,
+                full_name: formData.full_name || undefined,
+                phone: formData.phone || undefined,
             };
 
-            // Store token in localStorage
-            localStorage.setItem('auth_token', mockToken);
-            localStorage.setItem('user', JSON.stringify(mockUser));
+            const response = await authService.register(registerData);
 
-            // Set cookie for middleware
-            document.cookie = `auth_token=${mockToken}; path=/; max-age=86400; SameSite=Strict`;
+            // Store auth data
+            authService.setAuthData(response.token, response.user);
 
-            // Redirect to dashboard
-            router.push('/');
-        } catch (error) {
+            // Redirect based on role
+            if (response.user.role === 'admin') {
+                router.push('/admin');
+            } else {
+                router.push('/');
+            }
+        } catch (error: unknown) {
             console.error('Registration failed:', error);
-            alert('Đăng ký thất bại. Vui lòng thử lại.');
+            const errorMessage = error instanceof Error ? error.message : 'Đăng ký thất bại. Vui lòng thử lại.';
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -63,6 +96,11 @@ const RegisterPage = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
+
+        // Clear error when user starts typing
+        if (error) {
+            setError('');
+        }
     };
 
     return (
@@ -82,19 +120,45 @@ const RegisterPage = () => {
 
                     {/* Register Form */}
                     <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+                        {/* Error Message */}
+                        {error && (
+                            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <p className="text-red-600 text-sm">{error}</p>
+                            </div>
+                        )}
+
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            {/* Name Field */}
+                            {/* Username Field */}
                             <div className="space-y-2">
-                                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                                    Tên đăng nhập *
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        id="username"
+                                        name="username"
+                                        type="text"
+                                        required
+                                        value={formData.username}
+                                        onChange={handleInputChange}
+                                        className="input pl-10 w-full"
+                                        placeholder="Nhập tên đăng nhập"
+                                        minLength={3}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Full Name Field */}
+                            <div className="space-y-2">
+                                <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
                                     Họ và tên
                                 </label>
                                 <div className="relative">
                                     <input
-                                        id="name"
-                                        name="name"
+                                        id="full_name"
+                                        name="full_name"
                                         type="text"
-                                        required
-                                        value={formData.name}
+                                        value={formData.full_name}
                                         onChange={handleInputChange}
                                         className="input pl-10 w-full"
                                         placeholder="Nhập họ và tên"
@@ -105,7 +169,7 @@ const RegisterPage = () => {
                             {/* Email Field */}
                             <div className="space-y-2">
                                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                    Email
+                                    Email *
                                 </label>
                                 <div className="relative">
                                     <input
@@ -121,10 +185,28 @@ const RegisterPage = () => {
                                 </div>
                             </div>
 
+                            {/* Phone Field */}
+                            <div className="space-y-2">
+                                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                                    Số điện thoại
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        id="phone"
+                                        name="phone"
+                                        type="tel"
+                                        value={formData.phone}
+                                        onChange={handleInputChange}
+                                        className="input pl-10 w-full"
+                                        placeholder="Nhập số điện thoại"
+                                    />
+                                </div>
+                            </div>
+
                             {/* Password Field */}
                             <div className="space-y-2">
                                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                    Mật khẩu
+                                    Mật khẩu *
                                 </label>
                                 <div className="relative">
                                     <input
@@ -136,6 +218,7 @@ const RegisterPage = () => {
                                         onChange={handleInputChange}
                                         className="input pl-10 pr-10 w-full"
                                         placeholder="Nhập mật khẩu"
+                                        minLength={6}
                                     />
                                     <button
                                         type="button"
@@ -154,7 +237,7 @@ const RegisterPage = () => {
                             {/* Confirm Password Field */}
                             <div className="space-y-2">
                                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                                    Xác nhận mật khẩu
+                                    Xác nhận mật khẩu *
                                 </label>
                                 <div className="relative">
                                     <input

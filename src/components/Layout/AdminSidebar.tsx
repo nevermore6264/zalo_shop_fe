@@ -13,7 +13,8 @@ import {
     Package,
     MessageCircle,
     LogOut,
-    User
+    User,
+    Smartphone
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -57,6 +58,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen }) => {
             title: 'Quản lý proxy',
             href: '/admin/proxies',
             icon: Server,
+        },
+        {
+            title: 'Quản lý tài khoản Zalo',
+            href: '/admin/zalo-accounts',
+            icon: Smartphone,
         },
 
         // Analytics Section
