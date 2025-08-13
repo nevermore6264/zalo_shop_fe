@@ -38,16 +38,6 @@ interface ContactMessage {
   replied_by?: number;
 }
 
-interface ContactInfo {
-  id: number;
-  type: "phone" | "email" | "telegram" | "address" | "other";
-  title: string;
-  value: string;
-  description?: string;
-  is_active: boolean;
-  sort_order: number;
-}
-
 interface MessageStats {
   total_messages: number;
   pending_messages: number;
@@ -58,12 +48,21 @@ interface MessageStats {
   messages_this_week: number;
 }
 
+interface FAQ {
+  id: number;
+  question: string;
+  answer: string;
+  category?: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 const AdminContactPage = () => {
-  const [activeTab, setActiveTab] = useState<"info" | "messages" | "faq">(
-    "messages"
-  );
+  const [activeTab, setActiveTab] = useState<"messages" | "faq">("messages");
   const [messages, setMessages] = useState<ContactMessage[]>([]);
-  const [contactInfo, setContactInfo] = useState<ContactInfo[]>([]);
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [stats, setStats] = useState<MessageStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -75,9 +74,8 @@ const AdminContactPage = () => {
     null
   );
   const [showMessageModal, setShowMessageModal] = useState(false);
-  const [editingContact, setEditingContact] = useState<ContactInfo | null>(
-    null
-  );
+  const [editingFaq, setEditingFaq] = useState<FAQ | null>(null);
+  const [showFaqModal, setShowFaqModal] = useState(false);
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -97,40 +95,6 @@ const AdminContactPage = () => {
       () => setToast({ show: false, message: "", type: "info" }),
       3000
     );
-  };
-
-  // Debug function to test authentication
-  const testAuth = async () => {
-    const token = localStorage.getItem("token");
-    console.log("Current token:", token);
-
-    if (!token) {
-      showToast(
-        "Không có token trong localStorage. Vui lòng đăng nhập lại.",
-        "error"
-      );
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/auth/verify", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-      console.log("Auth test result:", data);
-
-      if (response.ok) {
-        showToast("Token hợp lệ! User: " + data.user.username, "success");
-      } else {
-        showToast("Token không hợp lệ: " + data.message, "error");
-      }
-    } catch (error) {
-      console.error("Auth test error:", error);
-      showToast("Lỗi khi test authentication", "error");
-    }
   };
 
   // Fetch messages
@@ -181,10 +145,10 @@ const AdminContactPage = () => {
     }
   };
 
-  // Fetch contact info
-  const fetchContactInfo = async () => {
+  // Fetch FAQs
+  const fetchFaqs = async () => {
     try {
-      const response = await fetch("/api/contacts/admin", {
+      const response = await fetch("/api/contacts/admin/faqs", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -192,10 +156,95 @@ const AdminContactPage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setContactInfo(data);
+        setFaqs(data);
       }
     } catch (error) {
-      console.error("Error fetching contact info:", error);
+      console.error("Error fetching FAQs:", error);
+    }
+  };
+
+  // Create/Update FAQ
+  const saveFaq = async (faqData: Partial<FAQ>) => {
+    try {
+      const url = editingFaq
+        ? `/api/contacts/admin/faqs/${editingFaq.id}`
+        : "/api/contacts/admin/faqs";
+      const method = editingFaq ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(faqData),
+      });
+
+      if (response.ok) {
+        fetchFaqs();
+        setShowFaqModal(false);
+        setEditingFaq(null);
+        showToast(
+          `FAQ ${editingFaq ? "cập nhật" : "tạo"} thành công`,
+          "success"
+        );
+      } else {
+        const data = await response.json();
+        showToast(data.message || "Có lỗi xảy ra", "error");
+      }
+    } catch (error) {
+      console.error("Error saving FAQ:", error);
+      showToast("Có lỗi xảy ra khi lưu FAQ", "error");
+    }
+  };
+
+  // Delete FAQ
+  const deleteFaq = async (faqId: number) => {
+    if (!confirm("Bạn có chắc chắn muốn xóa FAQ này?")) return;
+
+    try {
+      const response = await fetch(`/api/contacts/admin/faqs/${faqId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (response.ok) {
+        fetchFaqs();
+        showToast("Đã xóa FAQ thành công", "success");
+      } else {
+        showToast("Có lỗi xảy ra khi xóa FAQ", "error");
+      }
+    } catch (error) {
+      console.error("Error deleting FAQ:", error);
+      showToast("Có lỗi xảy ra khi xóa FAQ", "error");
+    }
+  };
+
+  // Toggle FAQ status
+  const toggleFaqStatus = async (faqId: number) => {
+    try {
+      const response = await fetch(
+        `/api/contacts/admin/faqs/${faqId}?action=toggle`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        fetchFaqs();
+        showToast("Đã cập nhật trạng thái FAQ", "success");
+      } else {
+        showToast("Có lỗi xảy ra khi cập nhật trạng thái", "error");
+      }
+    } catch (error) {
+      console.error("Error toggling FAQ status:", error);
+      showToast("Có lỗi xảy ra khi cập nhật trạng thái", "error");
     }
   };
 
@@ -203,8 +252,8 @@ const AdminContactPage = () => {
     if (activeTab === "messages") {
       fetchMessages();
       fetchStats();
-    } else if (activeTab === "info") {
-      fetchContactInfo();
+    } else if (activeTab === "faq") {
+      fetchFaqs();
     }
   }, [activeTab, currentPage, statusFilter, priorityFilter, searchTerm]);
 
@@ -510,36 +559,18 @@ const AdminContactPage = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Quản Lý Liên Hệ</h1>
           <p className="text-gray-600 mt-1">
-            Quản lý thông tin liên hệ và tin nhắn khách hàng
+            Quản lý tin nhắn khách hàng và câu hỏi thường gặp
           </p>
         </div>
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={testAuth}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
-          >
-            Test Auth
-          </button>
-          <div className="flex items-center space-x-2">
-            <MessageCircle className="w-6 h-6 text-red-500" />
-            <span className="text-sm text-gray-500">Contact Management</span>
-          </div>
+        <div className="flex items-center space-x-2">
+          <MessageCircle className="w-6 h-6 text-red-500" />
+          <span className="text-sm text-gray-500">Contact Management</span>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveTab("info")}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === "info"
-                ? "border-orange-500 text-orange-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            }`}
-          >
-            Thông Tin Liên Hệ
-          </button>
           <button
             onClick={() => setActiveTab("messages")}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -548,7 +579,7 @@ const AdminContactPage = () => {
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             }`}
           >
-            Tin Nhắn Khách Hàng
+            Tin Nhắn
           </button>
           <button
             onClick={() => setActiveTab("faq")}
@@ -570,7 +601,7 @@ const AdminContactPage = () => {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Tin Nhắn Khách Hàng
+                  Tin Nhắn
                 </h2>
                 <p className="text-sm text-gray-600">
                   Quản lý tin nhắn từ khách hàng
@@ -847,81 +878,6 @@ const AdminContactPage = () => {
         </div>
       )}
 
-      {/* Contact Info Tab Content */}
-      {activeTab === "info" && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">
-                Thông Tin Liên Hệ
-              </h2>
-              <p className="text-sm text-gray-600">
-                Quản lý thông tin liên hệ công ty
-              </p>
-            </div>
-            <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Thêm thông tin
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {contactInfo.map((contact) => (
-              <div
-                key={contact.id}
-                className="border border-gray-200 rounded-lg p-4"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-2">
-                    {contact.type === "phone" && (
-                      <Phone className="w-5 h-5 text-blue-600" />
-                    )}
-                    {contact.type === "email" && (
-                      <Mail className="w-5 h-5 text-green-600" />
-                    )}
-                    {contact.type === "address" && (
-                      <MapPin className="w-5 h-5 text-orange-600" />
-                    )}
-                    {contact.type === "telegram" && (
-                      <MessageCircle className="w-5 h-5 text-purple-600" />
-                    )}
-                    <span className="text-sm font-medium text-gray-900">
-                      {contact.title}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <button className="text-gray-400 hover:text-gray-600">
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button className="text-gray-400 hover:text-gray-600">
-                      <Trash className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <p className="text-gray-600 mb-2">{contact.value}</p>
-                {contact.description && (
-                  <p className="text-sm text-gray-500">{contact.description}</p>
-                )}
-                <div className="mt-3 flex items-center justify-between">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      contact.is_active
-                        ? "text-green-600 bg-green-100"
-                        : "text-gray-600 bg-gray-100"
-                    }`}
-                  >
-                    {contact.is_active ? "Hoạt động" : "Không hoạt động"}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    Thứ tự: {contact.sort_order}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* FAQ Tab Content */}
       {activeTab === "faq" && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -934,65 +890,96 @@ const AdminContactPage = () => {
                 Quản lý câu hỏi và trả lời thường gặp
               </p>
             </div>
-            <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2">
+            <button
+              onClick={() => {
+                setEditingFaq(null);
+                setShowFaqModal(true);
+              }}
+              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2"
+            >
               <Plus className="w-4 h-4" />
               Thêm FAQ
             </button>
           </div>
 
-          <div className="space-y-4">
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h3 className="font-medium text-gray-900 mb-2">
-                Thời gian phản hồi là bao lâu?
-              </h3>
-              <p className="text-sm text-gray-600 mb-3">
-                Chúng tôi thường phản hồi trong vòng 24 giờ làm việc.
-              </p>
-              <div className="flex items-center justify-end space-x-2">
-                <button className="text-gray-400 hover:text-gray-600">
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <Trash className="w-4 h-4" />
-                </button>
-              </div>
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="spinner w-8 h-8 mx-auto"></div>
+              <p className="text-gray-600 mt-2">Đang tải...</p>
             </div>
-
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h3 className="font-medium text-gray-900 mb-2">
-                Có hỗ trợ khẩn cấp không?
-              </h3>
-              <p className="text-sm text-gray-600 mb-3">
-                Có, chúng tôi hỗ trợ khẩn cấp 24/7 qua Telegram và điện thoại.
-              </p>
-              <div className="flex items-center justify-end space-x-2">
-                <button className="text-gray-400 hover:text-gray-600">
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <Trash className="w-4 h-4" />
-                </button>
-              </div>
+          ) : faqs.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Chưa có FAQ nào</p>
             </div>
-
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h3 className="font-medium text-gray-900 mb-2">
-                Có thể liên hệ qua kênh nào?
-              </h3>
-              <p className="text-sm text-gray-600 mb-3">
-                Bạn có thể liên hệ qua điện thoại, email, Telegram hoặc form
-                trên trang này.
-              </p>
-              <div className="flex items-center justify-end space-x-2">
-                <button className="text-gray-400 hover:text-gray-600">
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <Trash className="w-4 h-4" />
-                </button>
-              </div>
+          ) : (
+            <div className="space-y-4">
+              {faqs.map((faq) => (
+                <div
+                  key={faq.id}
+                  className={`border rounded-lg p-4 ${
+                    faq.is_active
+                      ? "border-gray-200 bg-white"
+                      : "border-gray-100 bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-medium text-gray-900">
+                          {faq.question}
+                        </h3>
+                        {!faq.is_active && (
+                          <span className="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded">
+                            Ẩn
+                          </span>
+                        )}
+                        {faq.category && (
+                          <span className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded">
+                            {faq.category}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-600 mb-3">{faq.answer}</p>
+                      <div className="text-xs text-gray-500">
+                        Thứ tự: {faq.sort_order} | Tạo lúc:{" "}
+                        {new Date(faq.created_at).toLocaleDateString("vi-VN")}
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2 ml-4">
+                      <button
+                        onClick={() => toggleFaqStatus(faq.id)}
+                        className={`p-1 rounded ${
+                          faq.is_active
+                            ? "text-green-600 hover:text-green-800"
+                            : "text-gray-400 hover:text-gray-600"
+                        }`}
+                        title={faq.is_active ? "Ẩn FAQ" : "Hiện FAQ"}
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditingFaq(faq);
+                          setShowFaqModal(true);
+                        }}
+                        className="text-blue-600 hover:text-blue-800 p-1 rounded"
+                        title="Chỉnh sửa"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => deleteFaq(faq.id)}
+                        className="text-red-600 hover:text-red-800 p-1 rounded"
+                        title="Xóa"
+                      >
+                        <Trash className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -1208,7 +1195,159 @@ const AdminContactPage = () => {
           </div>
         </div>
       )}
+
+      {/* FAQ Modal */}
+      {showFaqModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900">
+                {editingFaq ? "Chỉnh sửa FAQ" : "Thêm FAQ mới"}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowFaqModal(false);
+                  setEditingFaq(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <FAQForm
+              faq={editingFaq}
+              onSubmit={saveFaq}
+              onCancel={() => {
+                setShowFaqModal(false);
+                setEditingFaq(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
+  );
+};
+
+// FAQ Form Component
+const FAQForm = ({
+  faq,
+  onSubmit,
+  onCancel,
+}: {
+  faq: FAQ | null;
+  onSubmit: (data: Partial<FAQ>) => void;
+  onCancel: () => void;
+}) => {
+  const [formData, setFormData] = useState({
+    question: faq?.question || "",
+    answer: faq?.answer || "",
+    category: faq?.category || "",
+    is_active: faq?.is_active ?? true,
+    sort_order: faq?.sort_order || 0,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Câu hỏi *
+        </label>
+        <input
+          type="text"
+          value={formData.question}
+          onChange={(e) =>
+            setFormData({ ...formData, question: e.target.value })
+          }
+          required
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          placeholder="Nhập câu hỏi..."
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Trả lời *
+        </label>
+        <textarea
+          value={formData.answer}
+          onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
+          required
+          rows={4}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          placeholder="Nhập câu trả lời..."
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Danh mục
+          </label>
+          <input
+            type="text"
+            value={formData.category}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            placeholder="VD: Thanh toán, Hỗ trợ..."
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Thứ tự hiển thị
+          </label>
+          <input
+            type="number"
+            value={formData.sort_order}
+            onChange={(e) =>
+              setFormData({ ...formData, sort_order: parseInt(e.target.value) })
+            }
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            placeholder="0"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center">
+        <input
+          type="checkbox"
+          id="is_active"
+          checked={formData.is_active}
+          onChange={(e) =>
+            setFormData({ ...formData, is_active: e.target.checked })
+          }
+          className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+        />
+        <label htmlFor="is_active" className="ml-2 block text-sm text-gray-900">
+          Hiển thị FAQ
+        </label>
+      </div>
+
+      <div className="flex justify-end space-x-3 pt-4 border-t">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+        >
+          Hủy
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+        >
+          {faq ? "Cập nhật" : "Tạo FAQ"}
+        </button>
+      </div>
+    </form>
   );
 };
 

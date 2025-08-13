@@ -21,6 +21,14 @@ interface ContactForm {
   message: string;
 }
 
+interface FAQ {
+  id: number;
+  question: string;
+  answer: string;
+  category?: string;
+  sort_order: number;
+}
+
 const ContactPage = () => {
   const [formData, setFormData] = useState<ContactForm>({
     name: "",
@@ -35,6 +43,8 @@ const ContactPage = () => {
     "idle" | "success" | "error"
   >("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [faqLoading, setFaqLoading] = useState(true);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -88,6 +98,26 @@ const ContactPage = () => {
 
   const isFormValid =
     formData.name && formData.email && formData.subject && formData.message;
+
+  // Fetch FAQs
+  const fetchFaqs = async () => {
+    try {
+      const response = await fetch("/api/contacts/faqs");
+      if (response.ok) {
+        const data = await response.json();
+        setFaqs(data);
+      }
+    } catch (error) {
+      console.error("Error fetching FAQs:", error);
+    } finally {
+      setFaqLoading(false);
+    }
+  };
+
+  // Fetch FAQs on component mount
+  React.useEffect(() => {
+    fetchFaqs();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -356,34 +386,34 @@ const ContactPage = () => {
               </h3>
             </div>
             <div className="card-body">
-              <div className="space-y-4">
-                <div className="border-b border-gray-200 pb-4">
-                  <h4 className="font-medium text-gray-900 mb-2">
-                    Thời gian phản hồi là bao lâu?
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    Chúng tôi thường phản hồi trong vòng 24 giờ làm việc.
-                  </p>
+              {faqLoading ? (
+                <div className="text-center py-4">
+                  <div className="spinner w-6 h-6 mx-auto"></div>
+                  <p className="text-gray-600 mt-2">Đang tải...</p>
                 </div>
-                <div className="border-b border-gray-200 pb-4">
-                  <h4 className="font-medium text-gray-900 mb-2">
-                    Có hỗ trợ khẩn cấp không?
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    Có, chúng tôi hỗ trợ khẩn cấp 24/7 qua Telegram và điện
-                    thoại.
-                  </p>
+              ) : faqs.length === 0 ? (
+                <div className="text-center py-4">
+                  <p className="text-gray-600">Chưa có câu hỏi nào</p>
                 </div>
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">
-                    Có thể liên hệ qua kênh nào?
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    Bạn có thể liên hệ qua điện thoại, email, Telegram hoặc form
-                    trên trang này.
-                  </p>
+              ) : (
+                <div className="space-y-4">
+                  {faqs.map((faq, index) => (
+                    <div
+                      key={faq.id}
+                      className={`${
+                        index < faqs.length - 1
+                          ? "border-b border-gray-200 pb-4"
+                          : ""
+                      }`}
+                    >
+                      <h4 className="font-medium text-gray-900 mb-2">
+                        {faq.question}
+                      </h4>
+                      <p className="text-sm text-gray-600">{faq.answer}</p>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
